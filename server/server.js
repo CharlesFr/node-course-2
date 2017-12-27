@@ -9,11 +9,10 @@ const { User } = require('./models/user');
 
 var app = express();
 
-
 // Middleware
 app.use(bodyParser.json());
 
-var port = 3000; //Process.env.PORT || 3000;
+var port = process.env.PORT || 3000;
 
 // CRUD operations
 // Create (POST) - Read (GET) - Update - Delete (DELETE)
