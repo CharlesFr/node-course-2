@@ -1,15 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const {
-  mongoose
-} = require('./db/mongoose');
-const {
-  Todo
-} = require('./models/todo');
-const {
-  User
-} = require('./models/user');
+const { ObjectId } = require('mongodb');
+
+const { mongoose } = require('./db/mongoose');
+const { Todo } = require('./models/todo');
+const { User } = require('./models/user');
 
 var app = express();
 
@@ -23,9 +19,7 @@ var port = 3000; //Process.env.PORT || 3000;
 // Create (POST) - Read (GET) - Update - Delete (DELETE)
 
 app.post('/todos', (req, res) => {
-  var todo = new Todo({
-    text: req.body.text
-  })
+  var todo = new Todo({ text: req.body.text })
 
   todo.save().then((doc) => {
     res.send(doc);
@@ -45,12 +39,26 @@ app.get('/todos', (req, res) => {
   })
 });
 
-app.listen(port, () => {
-  console.log(`Started on port ${port}`)
-});
+app.get('/todos/:id', (req, res) => {
+  let id = req.params.id;
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Todo.findById(id).then((todos) => {
+    if (!todos) {
+      return res.status(404).send();
+    }
+    res.status(200).send({ todos });
+  }).catch((e) => {
+    res.status(404).send();
+  });
+
+})
+
+app.listen(port, () => console.log(`Started on port ${port}`));
 
 
 
-module.exports = {
-  app
-};
+module.exports = { app };
